@@ -2,22 +2,72 @@
 import Calendar from './CalendarMonth.vue'
 import { months } from '@/utils/calendarUtils'
 import InvfinityCarousel from './InfinityCarousel.vue'
+import { RouterLink } from 'vue-router'
+import { motion } from 'motion-v'
+import { useSelectedDateStore } from '@/app/stores/selectedDate'
+import { computed } from 'vue'
+
+const store = useSelectedDateStore()
+const { setSelectedYear } = useSelectedDateStore()
+const year = computed(() => store.selectedDate.getFullYear())
+const fixedYear = store.selectedDate.getFullYear()
+
+const variants = [
+  'top left',
+  'top',
+  'top right',
+  'left 20%',
+  'center 20%',
+  'right 20%',
+  'left 50%',
+  'center 50%',
+  'right 50%',
+  'left 70%',
+  'center 70%',
+  'right 70%',
+]
 </script>
 
 <template>
+  <h2 class="bg-white relative px-5 py-2 z-10">{{ year }}</h2>
   <div class="px-5">
-    <h2>2025</h2>
-    <InvfinityCarousel>
-      <template #item="{ item }">
-        <div class="grid grid-cols-3 gap-3">
-          <Calendar
-            v-for="(month, index) in months"
-            :key="2025 + item.id + '-' + index"
-            :year="2025 + item.id"
-            :monthIndex="index"
-          />
-        </div>
-      </template>
-    </InvfinityCarousel>
+    <motion.div
+      :initial="{ scale: 3, transformOrigin: variants[store.selectedDate.getMonth()] }"
+      :animate="{ scale: 1 }"
+      :transition="{ duration: 0.3 }"
+      class="z-0"
+    >
+      <InvfinityCarousel
+        :onNext="
+          () => {
+            setSelectedYear(year + 1)
+          }
+        "
+        :onPrev="
+          () => {
+            setSelectedYear(year - 1)
+          }
+        "
+      >
+        <template #item="{ item }">
+          <div class="grid grid-cols-3 gap-3">
+            <RouterLink
+              v-for="(month, index) in months"
+              :to="`/month/${index}`"
+              :key="fixedYear + item.id + '-' + index"
+              @click="store.setSelectedDate(new Date(fixedYear + item.id, index))"
+            >
+              <Calendar :year="fixedYear + item.id" :monthIndex="index" />
+            </RouterLink>
+          </div>
+        </template>
+      </InvfinityCarousel>
+    </motion.div>
   </div>
 </template>
+
+<!-- 1: двигаемся на странице -->
+<!-- 2: переходим с другой страницы -->
+-1 0 +1 +2
+<!-- 2024 2025 2026 2027 -->
+<!-- 2024 2026 2026 -->

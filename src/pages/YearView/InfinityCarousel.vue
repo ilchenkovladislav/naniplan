@@ -2,7 +2,8 @@
 import { motion } from 'motion-v'
 import { useCarousel } from '@/composables/useCarousel'
 
-const { containerRef, x, items, handleDragStart, handleDragEnd } = useCarousel()
+const { onNext, onPrev } = defineProps<{ onNext?: () => void; onPrev?: () => void }>()
+const { containerRef, x, items, handleDragStart, handleDragEnd } = useCarousel(onNext, onPrev)
 </script>
 
 <template>

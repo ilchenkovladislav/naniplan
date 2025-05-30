@@ -7,7 +7,12 @@ interface CarouselItem {
   x: number
 }
 
-export function useCarousel() {
+type SlideOption = {
+  duration: number
+  distancePerItem: number
+}
+
+export function useCarousel(onNext?: () => void, onPrev?: () => void) {
   const gap = 50
 
   const containerRef = ref<HTMLElement | null>(null)
@@ -47,12 +52,30 @@ export function useCarousel() {
     const distancePerItem = itemWidth.value + gap
 
     requestAnimationFrame(() => {
-      currentIndex.value = -x.get() / distancePerItem
+      const newIndex = -x.get() / distancePerItem
+      if (currentIndex.value > newIndex) {
+        onPrev?.()
+      } else if (currentIndex.value < newIndex) {
+        onNext?.()
+      }
+      currentIndex.value = newIndex
     })
   })
 
   function handleDragStart(e: PointerEvent) {
     xStart.value = e.clientX
+  }
+
+  function prevSlide({ duration, distancePerItem }: SlideOption) {
+    animate(x, (-currentIndex.value + 1) * distancePerItem, { duration })
+  }
+
+  function nextSlide({ duration, distancePerItem }: SlideOption) {
+    animate(x, (-currentIndex.value - 1) * distancePerItem, { duration })
+  }
+
+  function cancelSlide({ duration, distancePerItem }: SlideOption) {
+    animate(x, -currentIndex.value * distancePerItem, { duration })
   }
 
   function handleDragEnd(e: PointerEvent) {
@@ -62,11 +85,11 @@ export function useCarousel() {
     const duration = 0.3
 
     if (dx > distanceToSlide) {
-      animate(x, (-currentIndex.value + 1) * distancePerItem, { duration })
+      prevSlide({ duration, distancePerItem })
     } else if (dx < -distanceToSlide) {
-      animate(x, (-currentIndex.value - 1) * distancePerItem, { duration })
+      nextSlide({ duration, distancePerItem })
     } else {
-      animate(x, -currentIndex.value * distancePerItem, { duration })
+      cancelSlide({ duration, distancePerItem })
     }
   }
 
