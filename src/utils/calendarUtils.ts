@@ -25,7 +25,7 @@ export const months = [
 
 export const daysOfWeek = ['п', 'в', 'с', 'ч', 'п', 'с', 'в'] as const
 
-type CalendarDay = {
+export type CalendarDay = {
   date: Date
   isCurrentMonth: boolean
 }

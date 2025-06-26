@@ -16,5 +16,13 @@ export const useSelectedDateStore = defineStore('selectedDate', () => {
     )
   }
 
-  return { selectedDate, setSelectedDate, setSelectedYear }
+  function setSelectedMonth(newMonth: number) {
+    selectedDate.value = new Date(
+      selectedDate.value.getFullYear(),
+      newMonth,
+      selectedDate.value.getDate(),
+    )
+  }
+
+  return { selectedDate, setSelectedDate, setSelectedYear, setSelectedMonth }
 })
