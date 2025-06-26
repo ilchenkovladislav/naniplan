@@ -7,12 +7,12 @@ const dates = computed(() => cacheCalendarMonth(year, monthIndex))
 </script>
 
 <template>
-  <div class="relative grid gap-1 grid-rows-[min-content_min-content_1fr]">
+  <div class="relative grid grid-rows-[min-content_min-content_1fr] gap-1">
     <div class="relative grid w-max items-center">
       <h3 class="w-max text-sm">{{ months[monthIndex] }}</h3>
     </div>
 
-    <div class="grid grid-cols-8 start-2 text-center text-xs text-gray-400">
+    <div class="start-2 grid grid-cols-8 text-center text-xs text-gray-400">
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
         {{ dayOfWeek }}
       </div>

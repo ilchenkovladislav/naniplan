@@ -28,26 +28,26 @@ const editor = useEditor({
   <template v-if="editor">
     <editor-content :editor="editor" class="editor-content h-dvh" />
     <div
-      class="fixed bottom-0 left-0 right-0 z-50 bg-white flex justify-center gap-4 py-3"
+      class="fixed right-0 bottom-0 left-0 z-50 flex justify-center gap-4 bg-white py-3"
       style="touch-action: none"
     >
       <button
         @click="editor.chain().focus().toggleBold().run()"
-        :class="['px-4 py-2 rounded', { 'bg-gray-200 font-bold': editor.isActive('bold') }]"
+        :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': editor.isActive('bold') }]"
         aria-label="Bold"
       >
         <LucideBold :size="20" />
       </button>
       <button
         @click="editor.chain().focus().toggleItalic().run()"
-        :class="['px-4 py-2 rounded', { 'bg-gray-200 font-bold': editor.isActive('italic') }]"
+        :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': editor.isActive('italic') }]"
         aria-label="Italic"
       >
         <LucideItalic :size="20" />
       </button>
       <button
         @click="editor.chain().focus().toggleTaskList().run()"
-        :class="['px-4 py-2 rounded', { 'bg-gray-200 font-bold': editor.isActive('taskList') }]"
+        :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': editor.isActive('taskList') }]"
         aria-label="Task List"
       >
         <SquareCheck :size="20" />

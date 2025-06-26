@@ -29,7 +29,7 @@ const variants = [
 </script>
 
 <template>
-  <h2 class="bg-white relative px-5 py-2 z-10">{{ year }}</h2>
+  <h2 class="relative z-10 bg-white px-5 py-2">{{ year }}</h2>
   <div class="px-5">
     <motion.div
       :initial="{ scale: 3, transformOrigin: variants[store.selectedDate.getMonth()] }"
@@ -40,6 +40,8 @@ const variants = [
       <InvfinityCarousel
         :onNext="
           () => {
+            console.log('next')
+
             setSelectedYear(year + 1)
           }
         "
