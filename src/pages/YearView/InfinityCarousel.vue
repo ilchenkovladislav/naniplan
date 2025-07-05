@@ -7,7 +7,7 @@ const { containerRef, x, items, handleDragStart, handleDragEnd } = useCarousel(o
 </script>
 
 <template>
-  <div class="relative h-dvh overflow-hidden" ref="containerRef">
+  <div class="relative h-full overflow-hidden" ref="containerRef">
     <motion.div
       class="relative h-full will-change-transform"
       drag="x"

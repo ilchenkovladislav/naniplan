@@ -29,41 +29,41 @@ const variants = [
 </script>
 
 <template>
-  <h2 class="relative z-10 bg-white px-5 py-2">{{ year }}</h2>
-  <div class="px-5">
-    <motion.div
-      :initial="{ scale: 3, transformOrigin: variants[store.selectedDate.getMonth()] }"
-      :animate="{ scale: 1 }"
-      :transition="{ duration: 0.3 }"
-      class="z-0"
-    >
-      <InvfinityCarousel
-        :onNext="
-          () => {
-            console.log('next')
-
-            setSelectedYear(year + 1)
-          }
-        "
-        :onPrev="
-          () => {
-            setSelectedYear(year - 1)
-          }
-        "
+  <div class="grid h-dvh grid-rows-[auto_1fr]">
+    <h2 class="relative z-10 bg-white px-5 py-2">{{ year }}</h2>
+    <div class="grid px-5">
+      <motion.div
+        :initial="{ scale: 3, transformOrigin: variants[store.selectedDate.getMonth()] }"
+        :animate="{ scale: 1 }"
+        :transition="{ duration: 0.3 }"
+        class="z-0"
       >
-        <template #item="{ item }">
-          <div class="grid grid-cols-3 gap-3">
-            <RouterLink
-              v-for="(month, index) in months"
-              :to="`/month/${index}`"
-              :key="fixedYear + item.id + '-' + index"
-              @click="store.setSelectedDate(new Date(fixedYear + item.id, index))"
-            >
-              <Calendar :year="fixedYear + item.id" :monthIndex="index" />
-            </RouterLink>
-          </div>
-        </template>
-      </InvfinityCarousel>
-    </motion.div>
+        <InvfinityCarousel
+          :onNext="
+            () => {
+              setSelectedYear(year + 1)
+            }
+          "
+          :onPrev="
+            () => {
+              setSelectedYear(year - 1)
+            }
+          "
+        >
+          <template #item="{ item }">
+            <div class="grid grid-cols-3 gap-3">
+              <RouterLink
+                v-for="(month, index) in months"
+                to="/editor"
+                :key="fixedYear + item.id + '-' + index"
+                @click="store.setSelectedDate(new Date(fixedYear + item.id, index))"
+              >
+                <Calendar :year="fixedYear + item.id" :monthIndex="index" />
+              </RouterLink>
+            </div>
+          </template>
+        </InvfinityCarousel>
+      </motion.div>
+    </div>
   </div>
 </template>

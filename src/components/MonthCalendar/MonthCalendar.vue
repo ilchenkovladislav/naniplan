@@ -1,33 +1,37 @@
 <script setup lang="ts">
 import { useSelectedDateStore } from '@/app/stores/selectedDate'
 import { cacheCalendarMonth, type CalendarDay } from '@/utils/calendarUtils'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import InvfinityCarousel from '@/pages/YearView/InfinityCarousel.vue'
+import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
 
 const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
 
-const { monthIndex = 5, year = new Date().getFullYear() } = defineProps<{
-  monthIndex?: number
-  year?: number
-}>()
 const selectedStore = useSelectedDateStore()
-const dates = computed(() =>
-  cacheCalendarMonth(
-    selectedStore.selectedDate.getFullYear(),
-    selectedStore.selectedDate.getMonth(),
-  ),
-)
+
+const monthIndex = selectedStore.selectedDate.getMonth()
+const year = selectedStore.selectedDate.getFullYear()
 
 const handleDayClick = (day: CalendarDay) => {
   selectedStore.setSelectedDate(day.date)
 }
+
+const state = ref(new Date(year, monthIndex))
+
+const dates = computed(() => {
+  return cacheCalendarMonth(state.value.getFullYear(), state.value.getMonth())
+})
 </script>
 
 <template>
   <div class="relative grid grid-rows-[min-content_1fr]">
     <div
-      class="start-2 ml-[20px] grid grid-cols-7 border-b border-gray-200 text-center text-sm text-gray-400"
+      class="start-2 grid grid-cols-[20px_repeat(7,_1fr)] border-b border-gray-200 text-center text-sm text-gray-400"
     >
+      <div class="grid items-center justify-center border-r border-transparent">
+        <BaseIndicator />
+      </div>
+
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
         {{ dayOfWeek }}
       </div>
@@ -42,22 +46,15 @@ const handleDayClick = (day: CalendarDay) => {
           :key="week.weekNumber"
           class="relative flex justify-center"
         >
-          <div class="grid h-10 items-center text-center text-xs text-gray-400">
+          <div class="relative grid h-10 items-center text-center text-xs text-gray-400">
+            <BaseIndicator :customClass="'absolute top-0.5 justify-self-center'" />
             {{ week.weekNumber }}
           </div>
         </div>
       </div>
       <InvfinityCarousel
-        :onNext="
-          () => {
-            selectedStore.setSelectedMonth(selectedStore.selectedDate.getMonth() + 1)
-          }
-        "
-        :onPrev="
-          () => {
-            selectedStore.setSelectedMonth(selectedStore.selectedDate.getMonth() - 1)
-          }
-        "
+        :onNext="() => (state = new Date(state.getFullYear(), state.getMonth() + 1))"
+        :onPrev="() => (state = new Date(state.getFullYear(), state.getMonth() - 1))"
       >
         <template #item="{ item }">
           <div class="grid grid-cols-7 items-center justify-end gap-y-3">
@@ -69,7 +66,7 @@ const handleDayClick = (day: CalendarDay) => {
                 <div class="flex justify-center">
                   <div
                     :class="[
-                      'flex size-10 items-center justify-center text-lg',
+                      'relative flex size-10 items-center justify-center text-lg',
                       { 'text-gray-400': !day.isCurrentMonth },
                       {
                         'rounded-full border border-gray-200 text-orange-600':
@@ -78,6 +75,7 @@ const handleDayClick = (day: CalendarDay) => {
                     ]"
                     @click="() => handleDayClick(day)"
                   >
+                    <BaseIndicator :customClass="'absolute top-0.5 justify-self-center'" />
                     {{ day.date.getDate() }}
                   </div>
                 </div>
