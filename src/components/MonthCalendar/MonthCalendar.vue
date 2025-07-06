@@ -4,6 +4,7 @@ import { cacheCalendarMonth, type CalendarDay } from '@/utils/calendarUtils'
 import { computed, ref } from 'vue'
 import InvfinityCarousel from '@/pages/YearView/InfinityCarousel.vue'
 import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
+import { useNotesKeys } from '@/composables/useNotes'
 
 const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
 
@@ -21,6 +22,8 @@ const state = ref(new Date(year, monthIndex))
 const dates = computed(() => {
   return cacheCalendarMonth(state.value.getFullYear(), state.value.getMonth())
 })
+
+const keysManager = useNotesKeys()
 </script>
 
 <template>
@@ -29,7 +32,7 @@ const dates = computed(() => {
       class="start-2 grid grid-cols-[20px_repeat(7,_1fr)] border-b border-gray-200 text-center text-sm text-gray-400"
     >
       <div class="grid items-center justify-center border-r border-transparent">
-        <BaseIndicator />
+        <BaseIndicator v-if="keysManager.getNote(keysManager.getKeyByType('month', state))" />
       </div>
 
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
@@ -47,7 +50,10 @@ const dates = computed(() => {
           class="relative flex justify-center"
         >
           <div class="relative grid h-10 items-center text-center text-xs text-gray-400">
-            <BaseIndicator :customClass="'absolute top-0.5 justify-self-center'" />
+            <BaseIndicator
+              v-if="keysManager.getNote(keysManager.getKeyByType('week', week.end))"
+              :customClass="'absolute top-0.5 justify-self-center'"
+            />
             {{ week.weekNumber }}
           </div>
         </div>
@@ -75,7 +81,10 @@ const dates = computed(() => {
                     ]"
                     @click="() => handleDayClick(day)"
                   >
-                    <BaseIndicator :customClass="'absolute top-0.5 justify-self-center'" />
+                    <BaseIndicator
+                      v-if="keysManager.getNote(keysManager.getKeyByType('day', day.date))"
+                      :customClass="'absolute top-1 justify-self-center'"
+                    />
                     {{ day.date.getDate() }}
                   </div>
                 </div>

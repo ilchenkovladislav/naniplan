@@ -50,6 +50,9 @@ export function useCarousel(onNext?: () => void, onPrev?: () => void) {
 
   useMotionValueEvent(x, 'animationComplete', () => {
     const distancePerItem = itemWidth.value + gap
+    if (!x.getVelocity()) {
+      return
+    }
 
     requestAnimationFrame(() => {
       const newIndex = -x.get() / distancePerItem

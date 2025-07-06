@@ -5,5 +5,5 @@ const classes = defineProps<{
 </script>
 
 <template>
-  <div :class="classes.customClass" class="size-[5px] rounded-full bg-orange-600"></div>
+  <div :class="classes.customClass" class="size-1 rounded-full bg-gray-400"></div>
 </template>
