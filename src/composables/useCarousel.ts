@@ -87,6 +87,12 @@ export function useCarousel(onNext?: () => void, onPrev?: () => void) {
     const distanceToSlide = distancePerItem / 3
     const duration = 0.3
 
+    //fix chrome bug
+    if (!e.clientX) {
+      cancelSlide({ duration, distancePerItem })
+      return
+    }
+
     if (dx > distanceToSlide) {
       prevSlide({ duration, distancePerItem })
     } else if (dx < -distanceToSlide) {
