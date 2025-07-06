@@ -1,6 +1,6 @@
 {
   "name": "naniplan",
-  "version": "0.0.0",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
+    "homepage": "https://ilchenkovladislav.github.io/naniplan",
     "predeploy": "pnpm build",
     "deploy": "gh-pages -d dist"
   },
