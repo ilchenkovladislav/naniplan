@@ -23,7 +23,7 @@ import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
 type PeriodType = 'day' | 'week' | 'month' | 'year'
 type EditorData = Record<PeriodType, string>
 
-const viewType: Ref<PeriodType> = ref('year')
+const viewType: Ref<PeriodType> = ref('day')
 
 const changeViewType = (type: PeriodType) => {
   viewType.value = type
