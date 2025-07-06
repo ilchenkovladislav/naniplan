@@ -130,7 +130,7 @@ function formatWeekRange(date: Date) {
 <template>
   <div class="grid h-dvh grid-rows-[auto_1fr]">
     <div class="flex justify-between p-5">
-      <RouterLink to="/" class="text-gray-300">{{ formattedDate }}</RouterLink>
+      <RouterLink to="/yearView" class="text-gray-300">{{ formattedDate }}</RouterLink>
       <div class="flex gap-4">
         <button
           class="relative text-gray-300 transition-colors"

@@ -54,7 +54,7 @@ const variants = [
             <div class="grid grid-cols-3 gap-3">
               <RouterLink
                 v-for="(month, index) in months"
-                to="/editor"
+                to="/"
                 :key="fixedYear + item.id + '-' + index"
                 @click="store.setSelectedDate(new Date(fixedYear + item.id, index))"
               >
