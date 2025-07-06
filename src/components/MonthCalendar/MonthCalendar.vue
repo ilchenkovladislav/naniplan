@@ -5,6 +5,7 @@ import { computed, ref } from 'vue'
 import InvfinityCarousel from '@/pages/YearView/InfinityCarousel.vue'
 import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
 import { useNotesKeys } from '@/composables/useNotes'
+import { isToday } from 'date-fns'
 
 const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
 
@@ -74,6 +75,7 @@ const keysManager = useNotesKeys()
                     :class="[
                       'relative flex size-10 items-center justify-center text-lg',
                       { 'text-gray-400': !day.isCurrentMonth },
+                      { 'text-orange-300': isToday(day.date) },
                       {
                         'rounded-full border border-gray-200 text-orange-600':
                           day.date.toDateString() === selectedStore.selectedDate.toDateString(),

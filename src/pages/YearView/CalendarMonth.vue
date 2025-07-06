@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { cacheCalendarMonth, months, daysOfWeek } from '@/utils/calendarUtils'
 import { computed } from 'vue'
+import { isToday } from 'date-fns'
 
 const { monthIndex, year } = defineProps<{ monthIndex: number; year: number }>()
 const dates = computed(() => cacheCalendarMonth(year, monthIndex))
@@ -24,7 +25,9 @@ const dates = computed(() => cacheCalendarMonth(year, monthIndex))
           <div v-if="!day.isCurrentMonth" />
 
           <div v-else class="relative flex justify-center">
-            <div>{{ day.date.getDate() }}</div>
+            <div :class="[{ 'font-bold text-orange-600': isToday(day.date) }]">
+              {{ day.date.getDate() }}
+            </div>
           </div>
         </template>
 
