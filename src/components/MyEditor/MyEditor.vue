@@ -29,13 +29,30 @@ const changeViewType = (type: PeriodType) => {
   viewType.value = type
 }
 
-const saveEditorData = useDebounceFn((key, value) => {
-  localStorage.setItem(key, value)
-}, 500)
-
 const selectedDateStore = useSelectedDateStore()
-
 const keysManager = useNotesKeys()
+
+const notes = ref({
+  day: keysManager.getNote(keysManager.getKeyByType('day', selectedDateStore.selectedDate)),
+  week: keysManager.getNote(keysManager.getKeyByType('week', selectedDateStore.selectedDate)),
+  month: keysManager.getNote(keysManager.getKeyByType('month', selectedDateStore.selectedDate)),
+  year: keysManager.getNote(keysManager.getKeyByType('year', selectedDateStore.selectedDate)),
+})
+
+const saveEditorData = useDebounceFn((key: string, value: string, isEmpty = false) => {
+  if (isEmpty) {
+    localStorage.removeItem(key)
+  } else {
+    localStorage.setItem(key, value)
+  }
+
+  notes.value = {
+    day: keysManager.getNote(keysManager.getKeyByType('day', selectedDateStore.selectedDate)),
+    week: keysManager.getNote(keysManager.getKeyByType('week', selectedDateStore.selectedDate)),
+    month: keysManager.getNote(keysManager.getKeyByType('month', selectedDateStore.selectedDate)),
+    year: keysManager.getNote(keysManager.getKeyByType('year', selectedDateStore.selectedDate)),
+  }
+}, 500)
 
 const editorData: Ref<EditorData> = ref({
   day: '',
@@ -65,7 +82,7 @@ const editor = useEditor({
     const key = keysManager.getCurrentKeys(selectedDateStore.selectedDate)[viewType.value]
 
     editorData.value[viewType.value] = editor.getHTML()
-    saveEditorData(key, JSON.stringify(editor.getJSON()))
+    saveEditorData(key, JSON.stringify(editor.getJSON()), editor.isEmpty)
   },
 })
 
@@ -137,12 +154,7 @@ function formatWeekRange(date: Date) {
           :class="[{ 'text-orange-600': viewType === 'day' }]"
           @click="changeViewType('day')"
         >
-          <BaseIndicator
-            v-if="
-              keysManager.getNote(keysManager.getKeyByType('day', selectedDateStore.selectedDate))
-            "
-            :customClass="'absolute top-0 right-0'"
-          />
+          <BaseIndicator v-if="notes.day" :customClass="'absolute top-0 right-0'" />
           день
         </button>
         <button
@@ -150,12 +162,7 @@ function formatWeekRange(date: Date) {
           :class="[{ 'text-orange-600': viewType === 'week' }]"
           @click="changeViewType('week')"
         >
-          <BaseIndicator
-            v-if="
-              keysManager.getNote(keysManager.getKeyByType('week', selectedDateStore.selectedDate))
-            "
-            :customClass="'absolute top-0 right-0'"
-          />
+          <BaseIndicator v-if="notes.week" :customClass="'absolute top-0 right-0'" />
           неделя
         </button>
         <button
@@ -163,12 +170,7 @@ function formatWeekRange(date: Date) {
           :class="[{ 'text-orange-600': viewType === 'month' }]"
           @click="changeViewType('month')"
         >
-          <BaseIndicator
-            v-if="
-              keysManager.getNote(keysManager.getKeyByType('month', selectedDateStore.selectedDate))
-            "
-            :customClass="'absolute top-0 right-0'"
-          />
+          <BaseIndicator v-if="notes.month" :customClass="'absolute top-0 right-0'" />
           месяц
         </button>
         <button
@@ -176,12 +178,7 @@ function formatWeekRange(date: Date) {
           :class="[{ 'text-orange-600': viewType === 'year' }]"
           @click="changeViewType('year')"
         >
-          <BaseIndicator
-            v-if="
-              keysManager.getNote(keysManager.getKeyByType('year', selectedDateStore.selectedDate))
-            "
-            :customClass="'absolute top-0 right-0'"
-          />
+          <BaseIndicator v-if="notes.year" :customClass="'absolute top-0 right-0'" />
           год
         </button>
       </div>
