@@ -1,6 +1,6 @@
-import { animate, useMotionValue, useMotionValueEvent } from 'motion-v'
 import { ref, computed } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
+import { useMotion } from '@vueuse/motion'
 
 interface CarouselItem {
   id: number
@@ -8,7 +8,6 @@ interface CarouselItem {
 }
 
 type SlideOption = {
-  duration: number
   distancePerItem: number
 }
 
@@ -33,8 +32,7 @@ export function useCarousel(onNext?: () => void, onPrev?: () => void) {
     return Math.floor(containerWidth.value / 2 - itemWidth.value / 2)
   })
 
-  const x = useMotionValue(0)
-  const xStart = ref(0)
+  const lastX = ref(0)
   const currentIndex = ref(0)
 
   const items = computed<CarouselItem[]>(() => {
@@ -48,65 +46,92 @@ export function useCarousel(onNext?: () => void, onPrev?: () => void) {
     })
   })
 
-  useMotionValueEvent(x, 'animationComplete', () => {
-    const distancePerItem = itemWidth.value + gap
-    if (!x.getVelocity()) {
-      return
+  const domTarget = ref()
+  const motion = useMotion(domTarget)
+
+  const dragHandler = ({
+    movement: [x],
+    swipe: [swipeX],
+    first,
+    dragging,
+  }: {
+    movement: [number]
+    swipe: [number]
+    first: boolean
+    dragging: boolean
+  }) => {
+    if (!motion) return
+
+    if (first) {
+      lastX.value = motion.motionProperties.x ?? 0
     }
 
-    requestAnimationFrame(() => {
-      const newIndex = -x.get() / distancePerItem
-      if (currentIndex.value > newIndex) {
-        onPrev?.()
-      } else if (currentIndex.value < newIndex) {
-        onNext?.()
+    if (!dragging) {
+      const sign = Math.sign(x)
+      const swipe = Math.abs(swipeX) * sign
+      const distancePerItem = itemWidth.value + gap
+      const distanceToSlide = distancePerItem / 3
+
+      if (x > distanceToSlide || swipe === 1) {
+        prevSlide({ distancePerItem })
+
+        requestAnimationFrame(() => {
+          onPrev?.()
+          currentIndex.value--
+        })
+      } else if (x < -distanceToSlide || swipe === -1) {
+        nextSlide({ distancePerItem })
+
+        requestAnimationFrame(() => {
+          onNext?.()
+          currentIndex.value++
+        })
+      } else {
+        cancelSlide({ distancePerItem })
       }
-      currentIndex.value = newIndex
-    })
-  })
 
-  function handleDragStart(e: PointerEvent) {
-    xStart.value = e.clientX
-  }
-
-  function prevSlide({ duration, distancePerItem }: SlideOption) {
-    animate(x, (-currentIndex.value + 1) * distancePerItem, { duration })
-  }
-
-  function nextSlide({ duration, distancePerItem }: SlideOption) {
-    animate(x, (-currentIndex.value - 1) * distancePerItem, { duration })
-  }
-
-  function cancelSlide({ duration, distancePerItem }: SlideOption) {
-    animate(x, -currentIndex.value * distancePerItem, { duration })
-  }
-
-  function handleDragEnd(e: PointerEvent) {
-    const dx = e.clientX - xStart.value
-    const distancePerItem = itemWidth.value + gap
-    const distanceToSlide = distancePerItem / 3
-    const duration = 0.3
-
-    //fix chrome bug
-    if (!e.clientX) {
-      cancelSlide({ duration, distancePerItem })
       return
     }
 
-    if (dx > distanceToSlide) {
-      prevSlide({ duration, distancePerItem })
-    } else if (dx < -distanceToSlide) {
-      nextSlide({ duration, distancePerItem })
-    } else {
-      cancelSlide({ duration, distancePerItem })
-    }
+    motion.apply({
+      x: x + lastX.value,
+    })
+  }
+
+  function prevSlide({ distancePerItem }: SlideOption) {
+    motion.apply({
+      x: (-currentIndex.value + 1) * distancePerItem,
+      transition: {
+        type: 'tween',
+        duration: 300,
+      },
+    })
+  }
+
+  function nextSlide({ distancePerItem }: SlideOption) {
+    motion.apply({
+      x: (-currentIndex.value - 1) * distancePerItem,
+      transition: {
+        type: 'tween',
+        duration: 300,
+      },
+    })
+  }
+
+  function cancelSlide({ distancePerItem }: SlideOption) {
+    motion.apply({
+      x: -currentIndex.value * distancePerItem,
+      transition: {
+        type: 'tween',
+        duration: 300,
+      },
+    })
   }
 
   return {
     containerRef,
-    x,
     items,
-    handleDragStart,
-    handleDragEnd,
+    dragHandler,
+    domTarget,
   }
 }
