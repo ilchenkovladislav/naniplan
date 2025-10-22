@@ -2,7 +2,7 @@
 import { useSelectedDateStore } from '@/app/stores/selectedDate'
 import { cacheCalendarMonth, type CalendarDay } from '@/utils/calendarUtils'
 import { computed, ref } from 'vue'
-import InvfinityCarousel from '@/pages/YearView/InfinityCarousel.vue'
+import InvfinityCarousel from '@/components/InfinityCarousel/InfinityCarousel.vue'
 import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
 import { useNotesKeys } from '@/composables/useNotes'
 import { isToday } from 'date-fns'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Calendar from './CalendarMonth.vue'
+import Calendar from '../../components/SimpleCalendar/SimpleCalendar.vue'
 import { months } from '@/utils/calendarUtils'
-import InvfinityCarousel from './InfinityCarousel.vue'
+import InvfinityCarousel from '@/components/InfinityCarousel/InfinityCarousel.vue'
 import { RouterLink } from 'vue-router'
 import { motion } from 'motion-v'
 import { useSelectedDateStore } from '@/app/stores/selectedDate'

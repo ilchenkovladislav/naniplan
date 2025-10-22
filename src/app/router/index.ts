@@ -1,13 +1,13 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import YearView from '@/pages/YearView/YearView.vue'
-import MyEditor from '@/components/MyEditor/MyEditor.vue'
+import MainPage from '@/pages/MainPage/MainPage.vue'
 
 const router = createRouter({
   history: createWebHashHistory('/naniplan'),
   routes: [
     {
       path: '/',
-      component: MyEditor,
+      component: MainPage,
     },
     {
       path: '/yearView',
