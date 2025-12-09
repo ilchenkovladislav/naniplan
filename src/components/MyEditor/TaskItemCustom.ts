@@ -230,7 +230,7 @@ export const TaskItemCustom = Node.create<TaskItemOptions>({
         if (editor.isEditable && typeof getPos === 'function') {
           editor
             .chain()
-            .focus(undefined, { scrollIntoView: false })
+            // .focus(undefined, { scrollIntoView: false })
             .command(({ tr }) => {
               const position = getPos()
               if (typeof position !== 'number') {
