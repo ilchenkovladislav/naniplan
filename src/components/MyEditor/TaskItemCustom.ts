@@ -197,6 +197,7 @@ export const TaskItemCustom = Node.create<TaskItemOptions>({
       rect.setAttribute('height', '50')
       rect.setAttribute('stroke', 'oklch(64.6% 0.222 41.116)')
       rect.setAttribute('fill', 'none')
+      rect.setAttribute('rx', '5')
 
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
       g.setAttribute('transform', 'translate(0,-952.36222)')

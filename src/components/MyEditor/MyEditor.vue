@@ -62,13 +62,8 @@ const commands = {
   opacity: 0;
 }
 .path1 {
-  stroke-dasharray: 400;
-  stroke-dashoffset: 400;
-  transition: 0.3s all;
-}
-.path2 {
-  stroke-dasharray: 1800;
-  stroke-dashoffset: 1800;
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
   transition: 0.3s all;
 }
 .check:checked + label svg g path {
