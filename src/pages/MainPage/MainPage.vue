@@ -111,7 +111,9 @@ watch(selectedDateStore, () => {
 </script>
 
 <template>
-  <div class="grid h-dvh grid-rows-[auto_1fr]">
+  <div
+    class="fixed inset-0 grid grid-rows-[auto_1fr_auto_auto] [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto"
+  >
     <div class="flex justify-between p-5">
       <EditorDate :viewType />
       <EditorPeriodSwitcher
@@ -125,17 +127,15 @@ watch(selectedDateStore, () => {
         :onChangeViewType="changeViewType"
       />
     </div>
-    <div class="grid grid-rows-[1fr_auto_auto] gap-4">
-      <MyEditor
-        :editor="editor"
-        :initData="editorData[viewType]"
-        :onInit="
-          () => {
-            initializeEditorData()
-          }
-        "
-      />
-      <MonthCalendar />
-    </div>
+    <MyEditor
+      :editor="editor"
+      :initData="editorData[viewType]"
+      :onInit="
+        () => {
+          initializeEditorData()
+        }
+      "
+    />
+    <MonthCalendar />
   </div>
 </template>
