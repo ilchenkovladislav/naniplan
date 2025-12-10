@@ -1,23 +1,15 @@
 <script setup lang="ts">
-import { onMounted, toRef } from 'vue'
+import { toRef } from 'vue'
 
 import { EditorContent, type Editor } from '@tiptap/vue-3'
 
 import EditorToolbar from '../EditorToolbar/EditorToolbar.vue'
-import type { Content } from '@tiptap/vue-3'
 
 const props = defineProps<{
   editor: Editor | undefined
-  initData: Content
-  onInit: () => void
 }>()
 
 const editor = toRef(props, 'editor')
-
-onMounted(() => {
-  editor.value?.commands.setContent(props.initData)
-  props.onInit()
-})
 
 const commands = {
   toggleBold: () => editor.value?.chain().focus().toggleBold().run(),

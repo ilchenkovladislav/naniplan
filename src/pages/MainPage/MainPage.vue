@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Ref, ref, watch } from 'vue'
+import { onMounted, type Ref, ref, watch } from 'vue'
 
 import { useDebounceFn } from '@vueuse/core'
 
@@ -94,6 +94,7 @@ function initializeEditorData() {
   Object.keys(editorData.value).forEach((type) => {
     const key = currentKeys[type as PeriodType]
     const note = keysManager.getNote(key)
+    
     if (note) {
       editorData.value[type as PeriodType] = JSON.parse(note)
     } else {
@@ -101,6 +102,11 @@ function initializeEditorData() {
     }
   })
 }
+
+onMounted(() => {
+  initializeEditorData()
+  editor.value?.commands.setContent(editorData.value[viewType.value])
+})
 
 watch(viewType, (newVal) => {
   editor.value?.commands.setContent(editorData.value[newVal])
@@ -131,12 +137,6 @@ watch(selectedDateStore, () => {
     </div>
     <MyEditor
       :editor="editor"
-      :initData="editorData[viewType]"
-      :onInit="
-        () => {
-          initializeEditorData()
-        }
-      "
     />
     <MonthCalendar />
   </div>
