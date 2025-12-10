@@ -23,10 +23,12 @@ import { TaskItemCustom } from '@/components/MyEditor/TaskItemCustom'
 
 import type { EditorData, PeriodType } from './model/types'
 
-const viewType: Ref<PeriodType> = ref('day')
+const initViewType = (localStorage.getItem('viewType') as PeriodType) ?? 'day'
+const viewType: Ref<PeriodType> = ref(initViewType)
 
 const changeViewType = (type: PeriodType) => {
   viewType.value = type
+  localStorage.setItem('viewType', type)
 }
 
 const keysManager = useNotesKeys()

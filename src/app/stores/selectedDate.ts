@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useSelectedDateStore = defineStore('selectedDate', () => {
-  const selectedDate = ref(new Date())
+  const initSelectedDate = localStorage.getItem("lastSelectedDate") ?? new Date()
+  const selectedDate = ref(new Date(initSelectedDate))
 
   function setSelectedDate(newDate: Date) {
     selectedDate.value = newDate

@@ -16,6 +16,7 @@ const year = selectedStore.selectedDate.getFullYear()
 
 const handleDayClick = (day: CalendarDay) => {
   selectedStore.setSelectedDate(day.date)
+  localStorage.setItem("lastSelectedDate", day.date.toString())
 }
 
 const state = ref(new Date(year, monthIndex))
