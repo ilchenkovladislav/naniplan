@@ -37,7 +37,10 @@ const getGapClass = (date: Date) => {
 </script>
 
 <template>
-  <div class="relative grid grid-rows-[min-content_1fr]">
+  <div class="relative grid grid-rows-[min-content_min-content_1fr]">
+    <div class="justify-self-center text-gray-400">
+      {{ format(state, 'LLLL yyyy', { locale: ru }) }}
+    </div>
     <div
       class="start-2 grid grid-cols-[40px_repeat(7,_1fr)] border-b border-gray-100 py-2 text-center text-sm text-gray-400"
     >
