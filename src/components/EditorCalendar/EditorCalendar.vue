@@ -16,7 +16,7 @@ const year = selectedStore.selectedDate.getFullYear()
 
 const handleDayClick = (day: CalendarDay) => {
   selectedStore.setSelectedDate(day.date)
-  localStorage.setItem("lastSelectedDate", day.date.toString())
+  localStorage.setItem('lastSelectedDate', day.date.toString())
 }
 
 const state = ref(new Date(year, monthIndex))
@@ -31,7 +31,7 @@ const keysManager = useNotesKeys()
 <template>
   <div class="relative grid grid-rows-[min-content_1fr]">
     <div
-      class="start-2 grid grid-cols-[20px_repeat(7,_1fr)] border-b border-gray-200 text-center text-sm text-gray-400"
+      class="start-2 grid grid-cols-[40px_repeat(7,_1fr)] border-b border-gray-100 py-2 text-center text-sm text-gray-400"
     >
       <div class="grid items-center justify-center border-r border-transparent">
         <BaseIndicator v-if="keysManager.getNote(keysManager.getKeyByType('month', state))" />
@@ -42,9 +42,9 @@ const keysManager = useNotesKeys()
       </div>
     </div>
 
-    <div class="grid grid-cols-[20px_1fr] items-start">
+    <div class="grid grid-cols-[40px_1fr] items-start">
       <div
-        class="grid items-center justify-center gap-y-3 border-r border-r-gray-200 text-[10px] text-gray-400"
+        class="grid items-center justify-center gap-y-3 border-r border-r-gray-100 text-[10px] text-gray-400"
       >
         <div
           v-for="week in dates.weeks"
@@ -78,17 +78,27 @@ const keysManager = useNotesKeys()
                       { 'text-gray-400': !day.isCurrentMonth },
                       { 'text-orange-300': isToday(day.date) },
                       {
-                        'rounded-full border border-gray-200 text-orange-600':
+                        'rounded-full border border-orange-300 bg-red-100/30 font-bold text-orange-600':
                           day.date.toDateString() === selectedStore.selectedDate.toDateString(),
                       },
                     ]"
                     @click="() => handleDayClick(day)"
                   >
+                    {{ day.date.getDate() }}
                     <BaseIndicator
                       v-if="keysManager.getNote(keysManager.getKeyByType('day', day.date))"
-                      :customClass="'absolute top-1 justify-self-center'"
+                      :class="[
+                        'absolute justify-self-center',
+                        {
+                          '-bottom-2':
+                            day.date.toDateString() === selectedStore.selectedDate.toDateString(),
+                        },
+                        {
+                          'bottom-1':
+                            day.date.toDateString() !== selectedStore.selectedDate.toDateString(),
+                        },
+                      ]"
                     />
-                    {{ day.date.getDate() }}
                   </div>
                 </div>
               </template>
