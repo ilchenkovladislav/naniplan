@@ -5,7 +5,8 @@ import { computed, ref } from 'vue'
 import InvfinityCarousel from '@/components/InfinityCarousel/InfinityCarousel.vue'
 import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
 import { useNotesKeys } from '@/composables/useNotes'
-import { isToday } from 'date-fns'
+import { format, getWeeksInMonth, isToday } from 'date-fns'
+import { ru } from 'date-fns/locale'
 
 const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
 
@@ -26,6 +27,13 @@ const dates = computed(() => {
 })
 
 const keysManager = useNotesKeys()
+
+const getGapClass = (date: Date) => {
+  const weeksInMonth = getWeeksInMonth(date, { weekStartsOn: 1 })
+  if (weeksInMonth === 6) return 'gap-y-[1.6px]'
+  if (weeksInMonth === 4) return 'gap-y-[29.3px]'
+  return 'gap-y-3'
+}
 </script>
 
 <template>
@@ -44,7 +52,10 @@ const keysManager = useNotesKeys()
 
     <div class="grid grid-cols-[40px_1fr] items-start">
       <div
-        class="grid items-center justify-center gap-y-3 border-r border-r-gray-100 text-[10px] text-gray-400"
+        :class="[
+          'grid items-center justify-center border-r border-r-gray-100 text-[10px] text-gray-400',
+          getGapClass(state),
+        ]"
       >
         <div
           v-for="week in dates.weeks"
@@ -65,7 +76,12 @@ const keysManager = useNotesKeys()
         :onPrev="() => (state = new Date(state.getFullYear(), state.getMonth() - 1))"
       >
         <template #item="{ item }">
-          <div class="grid grid-cols-7 items-center justify-end gap-y-3">
+          <div
+            :class="[
+              'grid grid-cols-7 items-center justify-end',
+              getGapClass(new Date(year, monthIndex + item.id)),
+            ]"
+          >
             <template
               v-for="week in cacheCalendarMonth(year, monthIndex + item.id).weeks"
               :key="week.weekNumber"
