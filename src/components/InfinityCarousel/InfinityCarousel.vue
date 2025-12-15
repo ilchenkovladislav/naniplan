@@ -1,24 +1,19 @@
 <script setup lang="ts">
 import { useCarousel } from '@/composables/useCarousel'
-import { useDrag } from '@vueuse/gesture'
+import { motion } from 'motion-v'
 
 const { onNext, onPrev } = defineProps<{ onNext?: () => void; onPrev?: () => void }>()
-const { containerRef, items, dragHandler, domTarget } = useCarousel(onNext, onPrev)
-
-const dragOptions = {
-  axis: 'x',
-  domTarget,
-  swipeVelocity: 0.01,
-  swipeDistance: 1,
-  swipeDuration: 1000,
-}
-
-useDrag(dragHandler, dragOptions)
+const { containerRef, items, x, onDragEnd } = useCarousel(onNext, onPrev)
 </script>
 
 <template>
   <div class="relative h-full overflow-hidden" ref="containerRef">
-    <div class="relative h-full will-change-transform" ref="domTarget">
+    <motion.div
+      drag="x"
+      :style="{ x }"
+      class="relative h-full will-change-transform"
+      @dragEnd="onDragEnd"
+    >
       <div
         v-for="item in items"
         :key="item.id"
@@ -29,6 +24,6 @@ useDrag(dragHandler, dragOptions)
       >
         <slot name="item" :item="item" />
       </div>
-    </div>
+    </motion.div>
   </div>
 </template>

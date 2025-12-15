@@ -1,14 +1,10 @@
 import { ref, computed } from 'vue'
 import { useResizeObserver } from '@vueuse/core'
-import { useMotion } from '@vueuse/motion'
+import { animate, useMotionValue } from 'motion-v'
 
 interface CarouselItem {
   id: number
   x: number
-}
-
-type SlideOption = {
-  distancePerItem: number
 }
 
 export function useCarousel(onNext?: () => void, onPrev?: () => void) {
@@ -32,7 +28,6 @@ export function useCarousel(onNext?: () => void, onPrev?: () => void) {
     return Math.floor(containerWidth.value / 2 - itemWidth.value / 2)
   })
 
-  const lastX = ref(0)
   const currentIndex = ref(0)
 
   const items = computed<CarouselItem[]>(() => {
@@ -46,92 +41,57 @@ export function useCarousel(onNext?: () => void, onPrev?: () => void) {
     })
   })
 
-  const domTarget = ref()
-  const motion = useMotion(domTarget)
+  const x = useMotionValue(0)
 
-  const dragHandler = ({
-    movement: [x],
-    swipe: [swipeX],
-    first,
-    dragging,
-  }: {
-    movement: [number]
-    swipe: [number]
-    first: boolean
-    dragging: boolean
-  }) => {
-    if (!motion) return
+  function onDragEnd(event, info) {
+    const offset = info.offset.x
+    const velocity = info.velocity.x
+    const distancePerItem = itemWidth.value + gap
+    const distanceToSlide = distancePerItem / 3
 
-    if (first) {
-      lastX.value = motion.motionProperties.x ?? 0
+    let direction = 0
+
+    if (Math.abs(velocity) > 100) {
+      direction = velocity > 0 ? -1 : 1
+    } else if (Math.abs(offset) > distanceToSlide) {
+      direction = offset > 0 ? -1 : 1
     }
 
-    if (!dragging) {
-      const sign = Math.sign(x)
-      const swipe = Math.abs(swipeX) * sign
-      const distancePerItem = itemWidth.value + gap
-      const distanceToSlide = distancePerItem / 3
+    if (direction === -1) {
+      prevSlide({ distancePerItem })
 
-      if (x > distanceToSlide || swipe === 1) {
-        prevSlide({ distancePerItem })
+      requestAnimationFrame(() => {
+        onPrev?.()
+        currentIndex.value--
+      })
+    } else if (direction === 1) {
+      nextSlide({ distancePerItem })
 
-        requestAnimationFrame(() => {
-          onPrev?.()
-          currentIndex.value--
-        })
-      } else if (x < -distanceToSlide || swipe === -1) {
-        nextSlide({ distancePerItem })
-
-        requestAnimationFrame(() => {
-          onNext?.()
-          currentIndex.value++
-        })
-      } else {
-        cancelSlide({ distancePerItem })
-      }
-
-      return
+      requestAnimationFrame(() => {
+        onNext?.()
+        currentIndex.value++
+      })
+    } else {
+      cancelSlide({ distancePerItem })
     }
-
-    motion.apply({
-      x: x + lastX.value,
-    })
   }
 
-  function prevSlide({ distancePerItem }: SlideOption) {
-    motion.apply({
-      x: (-currentIndex.value + 1) * distancePerItem,
-      transition: {
-        type: 'tween',
-        duration: 300,
-      },
-    })
+  function prevSlide({ distancePerItem }) {
+    animate(x, (-currentIndex.value + 1) * distancePerItem)
   }
 
-  function nextSlide({ distancePerItem }: SlideOption) {
-    motion.apply({
-      x: (-currentIndex.value - 1) * distancePerItem,
-      transition: {
-        type: 'tween',
-        duration: 300,
-      },
-    })
+  function nextSlide({ distancePerItem }) {
+    animate(x, (-currentIndex.value - 1) * distancePerItem)
   }
 
-  function cancelSlide({ distancePerItem }: SlideOption) {
-    motion.apply({
-      x: -currentIndex.value * distancePerItem,
-      transition: {
-        type: 'tween',
-        duration: 300,
-      },
-    })
+  function cancelSlide({ distancePerItem }) {
+    animate(x, -currentIndex.value * distancePerItem)
   }
 
   return {
     containerRef,
     items,
-    dragHandler,
-    domTarget,
+    x,
+    onDragEnd,
   }
 }
