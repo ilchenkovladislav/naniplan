@@ -3,7 +3,6 @@ import { onMounted, type Ref, ref, watch } from 'vue'
 
 import { useDebounceFn } from '@vueuse/core'
 
-import { useNotesKeys } from '@/composables/useNotes'
 import { useSelectedDateStore } from '@/app/stores/selectedDate'
 
 import MyEditor from '@/components/MyEditor/MyEditor.vue'
@@ -22,6 +21,9 @@ import TaskList from '@tiptap/extension-task-list'
 import { TaskItemCustom } from '@/components/MyEditor/TaskItemCustom'
 
 import type { EditorData, PeriodType } from './model/types'
+import { createPlan, deletePlan, getAllPlans, updatePlan } from '@/app/db'
+import { usePlansStore } from '@/app/stores/plans.ts'
+import { getAllKeysForDate, getKeyByType } from '@/utils/keyUtils.ts'
 
 const initViewType = (localStorage.getItem('viewType') as PeriodType) ?? 'day'
 const viewType: Ref<PeriodType> = ref(initViewType)
@@ -31,30 +33,36 @@ const changeViewType = (type: PeriodType) => {
   localStorage.setItem('viewType', type)
 }
 
-const keysManager = useNotesKeys()
 const selectedDateStore = useSelectedDateStore()
 
-const notes = ref({
-  day: keysManager.getNote(keysManager.getKeyByType('day', selectedDateStore.selectedDate)),
-  week: keysManager.getNote(keysManager.getKeyByType('week', selectedDateStore.selectedDate)),
-  month: keysManager.getNote(keysManager.getKeyByType('month', selectedDateStore.selectedDate)),
-  year: keysManager.getNote(keysManager.getKeyByType('year', selectedDateStore.selectedDate)),
-})
+const plansStore = usePlansStore()
 
 const saveEditorData = useDebounceFn((value: string, isEmpty = false) => {
-  const key = keysManager.getCurrentKeys(selectedDateStore.selectedDate)[viewType.value]
+  const key = getKeyByType(selectedDateStore.selectedDate, viewType.value)
+  const plan = plansStore.plans.get(key)
 
   if (isEmpty) {
-    localStorage.removeItem(key)
-  } else {
-    localStorage.setItem(key, value)
+    if (!plan) return
+
+    deletePlan(plan.id).then(() => {
+      plansStore.plans.delete(key)
+    })
+    return
   }
 
-  notes.value = {
-    day: keysManager.getNote(keysManager.getKeyByType('day', selectedDateStore.selectedDate)),
-    week: keysManager.getNote(keysManager.getKeyByType('week', selectedDateStore.selectedDate)),
-    month: keysManager.getNote(keysManager.getKeyByType('month', selectedDateStore.selectedDate)),
-    year: keysManager.getNote(keysManager.getKeyByType('year', selectedDateStore.selectedDate)),
+  if (plan) {
+    updatePlan({ ...plan, content: value }).then(() => {
+      plan.content = value
+    })
+  } else {
+    createPlan({
+      key,
+      content: value,
+      type: 'week',
+      timestamp: new Date().getDate(),
+    }).then((res) => {
+      plansStore.plans.set(key, res)
+    })
   }
 }, 500)
 
@@ -89,21 +97,31 @@ const editor = useEditor({
 })
 
 function initializeEditorData() {
-  const currentKeys = keysManager.getCurrentKeys(selectedDateStore.selectedDate)
+  const currentKeys = getAllKeysForDate(selectedDateStore.selectedDate)
 
   Object.keys(editorData.value).forEach((type) => {
     const key = currentKeys[type as PeriodType]
-    const note = keysManager.getNote(key)
-    
-    if (note) {
-      editorData.value[type as PeriodType] = JSON.parse(note)
+    const plan = plansStore.plans.get(key)
+
+    if (plan) {
+      editorData.value[type as PeriodType] = JSON.parse(plan.content)
     } else {
       editorData.value[type as PeriodType] = ''
     }
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
+  const dbPlans = await getAllPlans()
+
+  const mapPlans = new Map()
+
+  for (const plan of dbPlans) {
+    mapPlans.set(plan.key, plan)
+  }
+
+  plansStore.plans = mapPlans
+
   initializeEditorData()
   editor.value?.commands.setContent(editorData.value[viewType.value])
 })
@@ -127,17 +145,15 @@ watch(selectedDateStore, () => {
       <EditorPeriodSwitcher
         :viewType
         :indicator="{
-          day: !!notes.day,
-          week: !!notes.week,
-          month: !!notes.month,
-          year: !!notes.year,
+          day: plansStore.hasPlan(selectedDateStore.selectedDate, 'day'),
+          week: plansStore.hasPlan(selectedDateStore.selectedDate, 'week'),
+          month: plansStore.hasPlan(selectedDateStore.selectedDate, 'month'),
+          year: plansStore.hasPlan(selectedDateStore.selectedDate, 'year'),
         }"
         :onChangeViewType="changeViewType"
       />
     </div>
-    <MyEditor
-      :editor="editor"
-    />
+    <MyEditor :editor="editor" />
     <MonthCalendar />
   </div>
 </template>

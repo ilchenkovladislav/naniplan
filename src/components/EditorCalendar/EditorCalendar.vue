@@ -2,11 +2,11 @@
 import { useSelectedDateStore } from '@/app/stores/selectedDate'
 import { cacheCalendarMonth, type CalendarDay } from '@/utils/calendarUtils'
 import { computed, ref } from 'vue'
-import InvfinityCarousel from '@/components/InfinityCarousel/InfinityCarousel.vue'
+import InfinityCarousel from '@/components/InfinityCarousel/InfinityCarousel.vue'
 import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
-import { useNotesKeys } from '@/composables/useNotes'
 import { format, getWeeksInMonth, isToday } from 'date-fns'
 import { ru } from 'date-fns/locale'
+import { usePlansStore } from '@/app/stores/plans.ts'
 
 const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
 
@@ -26,14 +26,14 @@ const dates = computed(() => {
   return cacheCalendarMonth(state.value.getFullYear(), state.value.getMonth())
 })
 
-const keysManager = useNotesKeys()
-
 const getGapClass = (date: Date) => {
   const weeksInMonth = getWeeksInMonth(date, { weekStartsOn: 1 })
   if (weeksInMonth === 6) return 'gap-y-[1.6px]'
   if (weeksInMonth === 4) return 'gap-y-[29.3px]'
   return 'gap-y-3'
 }
+
+const plansStore = usePlansStore()
 </script>
 
 <template>
@@ -45,7 +45,7 @@ const getGapClass = (date: Date) => {
       class="start-2 grid grid-cols-[40px_repeat(7,_1fr)] border-b border-gray-100 py-2 text-center text-sm text-gray-400"
     >
       <div class="grid items-center justify-center border-r border-transparent">
-        <BaseIndicator v-if="keysManager.getNote(keysManager.getKeyByType('month', state))" />
+        <BaseIndicator v-if="plansStore.hasPlan(state, 'month')" />
       </div>
 
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
@@ -67,14 +67,14 @@ const getGapClass = (date: Date) => {
         >
           <div class="relative grid h-10 items-center text-center text-xs text-gray-400">
             <BaseIndicator
-              v-if="keysManager.getNote(keysManager.getKeyByType('week', week.end))"
+              v-if="plansStore.hasPlan(week.end, 'week')"
               :customClass="'absolute top-0.5 justify-self-center'"
             />
             {{ week.weekNumber }}
           </div>
         </div>
       </div>
-      <InvfinityCarousel
+      <InfinityCarousel
         :onNext="() => (state = new Date(state.getFullYear(), state.getMonth() + 1))"
         :onPrev="() => (state = new Date(state.getFullYear(), state.getMonth() - 1))"
       >
@@ -105,7 +105,7 @@ const getGapClass = (date: Date) => {
                   >
                     {{ day.date.getDate() }}
                     <BaseIndicator
-                      v-if="keysManager.getNote(keysManager.getKeyByType('day', day.date))"
+                      v-if="plansStore.hasPlan(day.date, 'day')"
                       :class="[
                         'absolute justify-self-center',
                         {
@@ -124,7 +124,7 @@ const getGapClass = (date: Date) => {
             </template>
           </div>
         </template>
-      </InvfinityCarousel>
+      </InfinityCarousel>
     </div>
   </div>
 </template>
