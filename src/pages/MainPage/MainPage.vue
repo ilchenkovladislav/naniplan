@@ -138,10 +138,9 @@ watch(selectedDateStore, () => {
 
 <template>
   <div
-    class="fixed inset-0 grid grid-rows-[auto_1fr_auto_auto] [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto"
+    class="fixed inset-0 grid grid-rows-[auto_1fr_auto_max-content] [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto"
   >
-    <div class="flex justify-between p-5">
-      <EditorDate :viewType />
+    <div class="justify-center p-5 text-center">
       <EditorPeriodSwitcher
         :viewType
         :indicator="{
@@ -152,6 +151,7 @@ watch(selectedDateStore, () => {
         }"
         :onChangeViewType="changeViewType"
       />
+      <EditorDate :viewType />
     </div>
     <MyEditor :editor="editor" />
     <MonthCalendar />
