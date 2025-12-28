@@ -68,7 +68,7 @@ const plansStore = usePlansStore()
           <div class="relative grid h-10 items-center text-center text-xs text-gray-400">
             <BaseIndicator
               v-if="plansStore.hasPlan(week.end, 'week')"
-              :class="'absolute bottom-1 justify-self-center'"
+              :class="'absolute top-2 -right-1 justify-self-center'"
             />
             {{ week.weekNumber }}
           </div>
@@ -109,11 +109,11 @@ const plansStore = usePlansStore()
                       :class="[
                         'absolute justify-self-center',
                         {
-                          '-bottom-2':
+                          '-top-0.5 -right-0.5':
                             day.date.toDateString() === selectedStore.selectedDate.toDateString(),
                         },
                         {
-                          'bottom-1':
+                          'top-2 right-1':
                             day.date.toDateString() !== selectedStore.selectedDate.toDateString(),
                         },
                       ]"
