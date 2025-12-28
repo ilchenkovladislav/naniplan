@@ -8,7 +8,7 @@ import { useSelectedDateStore } from '@/app/stores/selectedDate'
 import MyEditor from '@/components/MyEditor/MyEditor.vue'
 import MonthCalendar from '@/components/EditorCalendar/EditorCalendar.vue'
 import EditorDate from '@/components/EditorDate/EditorDate.vue'
-import EditorPeriodSwitcher from '@/components/EditorPeriodSwitcher/EditorPeriodSwitcher.vue'
+import EditorPeriodSlider from '@/components/EditorPeriodSlider/EditorPeriodSlider.vue'
 
 import { useEditor } from '@tiptap/vue-3'
 import Document from '@tiptap/extension-document'
@@ -33,9 +33,25 @@ const changeViewType = (type: PeriodType) => {
   localStorage.setItem('viewType', type)
 }
 
+const valueToType = {
+  0: 'day',
+  33: 'week',
+  66: 'month',
+  100: 'year',
+}
+
+const typeToValue = {
+  day: 0,
+  week: 33,
+  month: 66,
+  year: 100,
+}
+
 const selectedDateStore = useSelectedDateStore()
 
 const plansStore = usePlansStore()
+
+const sliderValue = ref(typeToValue[localStorage.getItem('viewType')] ?? typeToValue['day'])
 
 const saveEditorData = useDebounceFn((value: string, isEmpty = false) => {
   const key = getKeyByType(selectedDateStore.selectedDate, viewType.value)
@@ -140,16 +156,31 @@ watch(selectedDateStore, () => {
   <div
     class="fixed inset-0 grid grid-rows-[auto_1fr_auto_max-content] [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto"
   >
-    <div class="justify-center p-5 text-center">
-      <EditorPeriodSwitcher
-        :viewType
-        :indicator="{
-          day: plansStore.hasPlan(selectedDateStore.selectedDate, 'day'),
-          week: plansStore.hasPlan(selectedDateStore.selectedDate, 'week'),
-          month: plansStore.hasPlan(selectedDateStore.selectedDate, 'month'),
-          year: plansStore.hasPlan(selectedDateStore.selectedDate, 'year'),
-        }"
-        :onChangeViewType="changeViewType"
+    <div class="p-5">
+      <EditorPeriodSlider
+        :class="'absolute top-[35%] right-2 z-9999'"
+        v-model="sliderValue"
+        @change="
+          (value) => {
+            changeViewType(valueToType[value])
+          }
+        "
+        @findClosestSnapPoint="
+          (value) => {
+            changeViewType(valueToType[value])
+          }
+        "
+        :min="0"
+        :max="100"
+        :height="150"
+        vertical
+        :snap-points="[
+          { value: 0, label: 'д' },
+          { value: 33, label: 'н' },
+          { value: 66, label: 'м' },
+          { value: 100, label: 'г' },
+        ]"
+        :snap-threshold="17"
       />
       <EditorDate :viewType />
     </div>

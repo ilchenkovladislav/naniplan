@@ -36,6 +36,7 @@ const commands = {
   height: 100%;
   outline: none;
   padding: 20px;
+  padding-right: 50px;
   font-size: 20px;
 }
 
