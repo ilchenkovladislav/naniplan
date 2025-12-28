@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, type Ref, ref, watch } from 'vue'
+import { onMounted, type Ref, ref, watch, provide } from 'vue'
 
 import { useDebounceFn } from '@vueuse/core'
 
@@ -31,7 +31,10 @@ const viewType: Ref<PeriodType> = ref(initViewType)
 const changeViewType = (type: PeriodType) => {
   viewType.value = type
   localStorage.setItem('viewType', type)
+  sliderValue.value = typeToValue[type]
 }
+
+provide('changeViewType', changeViewType)
 
 const valueToType = {
   0: 'day',

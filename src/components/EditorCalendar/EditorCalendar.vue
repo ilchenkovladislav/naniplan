@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useSelectedDateStore } from '@/app/stores/selectedDate'
 import { cacheCalendarMonth, type CalendarDay } from '@/utils/calendarUtils'
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 import InfinityCarousel from '@/components/InfinityCarousel/InfinityCarousel.vue'
 import BaseIndicator from '../BaseIndicator/BaseIndicator.vue'
 import { format, getWeeksInMonth, isToday } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { usePlansStore } from '@/app/stores/plans.ts'
+import type { PeriodType } from '@/pages/MainPage/model/types.ts'
 
 const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'] as const
 
@@ -34,20 +35,59 @@ const getGapClass = (date: Date) => {
 }
 
 const plansStore = usePlansStore()
+
+const changeViewType = inject<(type: PeriodType) => void>('changeViewType')
+
+function onMonthClick() {
+  selectedStore.setSelectedDate(state.value)
+
+  if (changeViewType) {
+    changeViewType('month')
+  }
+}
+
+function onYearClick() {
+  const oldYear = selectedStore.selectedDate.getFullYear()
+  const newYear = state.value.getFullYear()
+
+  if (oldYear !== newYear) {
+    selectedStore.setSelectedDate(state.value)
+  }
+
+  if (changeViewType) {
+    changeViewType('year')
+  }
+}
+
+function onWeekClick(date: Date) {
+  selectedStore.setSelectedDate(date)
+
+  if (changeViewType) {
+    changeViewType('week')
+  }
+}
 </script>
 
 <template>
   <div class="relative grid grid-rows-[min-content_min-content_1fr]">
-    <div class="justify-self-center text-gray-400">
-      {{ format(state, 'LLLL yyyy', { locale: ru }) }}
-    </div>
-    <div
-      class="start-2 grid grid-cols-[40px_repeat(7,_1fr)] border-b border-gray-100 py-2 text-center text-sm text-gray-400"
-    >
-      <div class="grid items-center justify-center border-r border-transparent">
-        <BaseIndicator v-if="plansStore.hasPlan(state, 'month')" />
+    <div class="flex gap-1 justify-self-center text-gray-400">
+      <div
+        :class="[{ 'first-letter:text-orange-400': plansStore.hasPlan(state, 'month') }]"
+        @click="onMonthClick"
+      >
+        {{ format(state, 'LLLL', { locale: ru }) }}
       </div>
 
+      <span
+        :class="[{ 'first-letter:text-orange-400': plansStore.hasPlan(state, 'year') }]"
+        @click="onYearClick"
+      >
+        {{ format(state, 'yyyy') }}
+      </span>
+    </div>
+    <div
+      class="grid grid-cols-[repeat(7,_1fr)] border-b border-gray-100 py-2 pl-[40px] text-center text-sm text-gray-400"
+    >
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
         {{ dayOfWeek }}
       </div>
@@ -65,7 +105,10 @@ const plansStore = usePlansStore()
           :key="week.weekNumber"
           class="relative flex justify-center"
         >
-          <div class="relative grid h-10 items-center text-center text-xs text-gray-400">
+          <div
+            class="relative grid h-10 items-center text-center text-xs text-gray-400"
+            @click="() => onWeekClick(week.start)"
+          >
             <BaseIndicator
               v-if="plansStore.hasPlan(week.end, 'week')"
               :class="'absolute top-2 -right-1 justify-self-center'"
