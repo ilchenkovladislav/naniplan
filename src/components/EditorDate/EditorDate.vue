@@ -13,17 +13,17 @@ const { viewType } = defineProps<{
 
 const DATE_FORMATS = {
   day: 'd MMMM yyyy',
-  week: 'd',
+  weekStart: 'd MMMM',
+  weekEnd: 'd MMMM yyyy',
   month: 'LLLL yyyy',
   year: 'yyyy',
 }
 
 function formatWeekRange(date: Date) {
-  const startDate = format(startOfISOWeek(date), DATE_FORMATS.week, { locale: ru })
-  const endDate = format(endOfISOWeek(date), DATE_FORMATS.week, { locale: ru })
-  const month = format(endOfISOWeek(date), 'MMM', { locale: ru })
-  const year = format(endOfISOWeek(date), 'yyyy', { locale: ru })
-  return `${startDate} — ${endDate} ${month} ${year}`
+  const startDate = format(startOfISOWeek(date), DATE_FORMATS.weekStart, { locale: ru })
+  const endDate = format(endOfISOWeek(date), DATE_FORMATS.weekEnd, { locale: ru })
+
+  return `${startDate} — ${endDate}`
 }
 
 const formatStrategies = {
