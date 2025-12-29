@@ -1,29 +1,28 @@
 <script setup lang="ts">
-import { onMounted, type Ref, ref, watch, provide } from 'vue'
+import { onMounted, type Ref, ref, watch, provide, onUnmounted } from 'vue'
 
 import { useDebounceFn } from '@vueuse/core'
 
 import { useSelectedDateStore } from '@/app/stores/selectedDate'
 
-import MyEditor from '@/components/MyEditor/MyEditor.vue'
 import MonthCalendar from '@/components/EditorCalendar/EditorCalendar.vue'
 import EditorDate from '@/components/EditorDate/EditorDate.vue'
 import EditorPeriodSlider from '@/components/EditorPeriodSlider/EditorPeriodSlider.vue'
-
-import { useEditor } from '@tiptap/vue-3'
-import Document from '@tiptap/extension-document'
-import Paragraph from '@tiptap/extension-paragraph'
-import Text from '@tiptap/extension-text'
-import Bold from '@tiptap/extension-bold'
-import Italic from '@tiptap/extension-italic'
-import TaskList from '@tiptap/extension-task-list'
-
-import { TaskItemCustom } from '@/components/MyEditor/TaskItemCustom'
 
 import type { EditorData, PeriodType } from './model/types'
 import { createPlan, deletePlan, getAllPlans, updatePlan } from '@/app/db'
 import { usePlansStore } from '@/app/stores/plans.ts'
 import { getAllKeysForDate, getKeyByType } from '@/utils/keyUtils.ts'
+import LexicalEditor from '@/components/LexicalEditor/LexicalEditor.vue'
+import { buildEditorFromExtensions } from '@lexical/extension'
+import { $createParagraphNode, $getRoot, defineExtension } from 'lexical'
+import { CheckListExtension } from '@lexical/list'
+import { mergeRegister } from '@lexical/utils'
+import { registerRichText } from '@lexical/rich-text'
+
+const editor = ref()
+let unregisterAll = null
+const editorRef = ref()
 
 const initViewType = (localStorage.getItem('viewType') as PeriodType) ?? 'day'
 const viewType: Ref<PeriodType> = ref(initViewType)
@@ -92,29 +91,6 @@ const editorData: Ref<EditorData> = ref({
   year: '',
 })
 
-const editor = useEditor({
-  content: '',
-  extensions: [
-    Document.extend({ content: 'block+' }),
-    Paragraph,
-    Text,
-    Bold,
-    Italic,
-    TaskList,
-    TaskItemCustom.extend({
-      content: 'paragraph',
-      HTMLAttributes: {
-        class: 'custom-task-item',
-      },
-    }),
-  ],
-
-  onUpdate: ({ editor }) => {
-    editorData.value[viewType.value] = editor.getHTML()
-    saveEditorData(JSON.stringify(editor.getJSON()), editor.isEmpty)
-  },
-})
-
 function initializeEditorData() {
   const currentKeys = getAllKeysForDate(selectedDateStore.selectedDate)
 
@@ -123,14 +99,58 @@ function initializeEditorData() {
     const plan = plansStore.plans.get(key)
 
     if (plan) {
-      editorData.value[type as PeriodType] = JSON.parse(plan.content)
+      editorData.value[type as PeriodType] = plan.content
     } else {
-      editorData.value[type as PeriodType] = ''
+      editorData.value[type as PeriodType] =
+        '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'
     }
   })
 }
 
 onMounted(async () => {
+  editor.value = buildEditorFromExtensions(
+    defineExtension({
+      name: 'LexicalEditor',
+      namespace: 'LexicalEditor',
+      dependencies: [CheckListExtension],
+      theme: {
+        paragraph: 'editor-paragraph',
+        text: {
+          bold: 'text-bold',
+          italic: 'text-italic',
+        },
+        list: {
+          checklist: 'checklist',
+          listitem: 'listitem',
+          listitemChecked: 'listitem-checked',
+          listitemUnchecked: 'listitem-unchecked',
+        },
+      },
+    }),
+  )
+
+  editor.value.update(() => {
+    const root = $getRoot()
+    if (root.isEmpty()) {
+      const paragraph = $createParagraphNode()
+      root.append(paragraph)
+    }
+  })
+
+  unregisterAll = mergeRegister(
+    registerRichText(editor.value),
+
+    editor.value.registerUpdateListener(({ editorState }) => {
+      let isEmpty = false
+
+      if (editorState._nodeMap.size === 2) {
+        isEmpty = true
+      }
+
+      saveEditorData(JSON.stringify(editorState.toJSON()), isEmpty)
+    }),
+  )
+
   const dbPlans = await getAllPlans()
 
   const mapPlans = new Map()
@@ -142,16 +162,27 @@ onMounted(async () => {
   plansStore.plans = mapPlans
 
   initializeEditorData()
-  editor.value?.commands.setContent(editorData.value[viewType.value])
+  const editorState = editor.value.parseEditorState(editorData.value[viewType.value])
+  editor.value.setEditorState(editorState)
+  // editor.value?.commands.setContent(editorData.value[viewType.value])
 })
 
 watch(viewType, (newVal) => {
-  editor.value?.commands.setContent(editorData.value[newVal])
+  initializeEditorData()
+  const editorState = editor.value.parseEditorState(editorData.value[newVal])
+  editor.value.setEditorState(editorState)
+  // editor.value?.commands.setContent(editorData.value[newVal])
 })
 
 watch(selectedDateStore, () => {
   initializeEditorData()
-  editor.value?.commands.setContent(editorData.value[viewType.value])
+  const editorState = editor.value.parseEditorState(editorData.value[viewType.value])
+  editor.value.setEditorState(editorState)
+  // editor.value?.commands.setContent(editorData.value[viewType.value])
+})
+
+onUnmounted(() => {
+  unregisterAll?.()
 })
 </script>
 
@@ -187,7 +218,7 @@ watch(selectedDateStore, () => {
       />
       <EditorDate :viewType />
     </div>
-    <MyEditor :editor="editor" />
+    <LexicalEditor v-if="editor" :editor="editor" ref="editorRef" />
     <MonthCalendar />
   </div>
 </template>
