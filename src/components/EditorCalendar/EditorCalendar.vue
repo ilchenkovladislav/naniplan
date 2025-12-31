@@ -66,10 +66,12 @@ function onWeekClick(date: Date) {
     changeViewType('week')
   }
 }
+
+const isFocused = inject('focus')
 </script>
 
 <template>
-  <div class="relative grid grid-rows-[min-content_min-content_1fr]">
+  <div v-if="!isFocused" class="relative grid grid-rows-[min-content_min-content_1fr]">
     <div class="flex gap-1 justify-self-center text-gray-400">
       <div
         :class="[{ 'first-letter:text-orange-400': plansStore.hasPlan(state, 'month') }]"

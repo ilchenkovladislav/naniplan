@@ -1,7 +1,11 @@
 <template>
-  <div ref="editorRef" class="editor" contenteditable="true"></div>
+  <div ref="editorRef" class="editor overscroll-none" contenteditable="true"></div>
 
-  <div class="mt-auto flex justify-center gap-4 bg-white py-3" style="touch-action: none">
+  <div
+    v-if="isFocused"
+    class="fixed inset-x-0 bottom-0 mt-auto flex translate-y-[calc(var(--keyboard-height,0)*-1)] justify-center gap-4 bg-white py-3 will-change-transform"
+    style="touch-action: none"
+  >
     <button @click="toggleBold" :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': isBold }]">
       <LucideBold :size="20" />
     </button>
@@ -21,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, inject } from 'vue'
 import {
   $getSelection,
   $isRangeSelection,
@@ -61,6 +65,8 @@ onMounted(() => {
     })
   })
 })
+
+const isFocused = inject('focus')
 
 onUnmounted(() => {
   unregist?.()
@@ -121,6 +127,7 @@ function toggleCheckList() {
   min-height: 250px;
   height: 100%;
   padding: 16px;
+  padding-bottom: 60px;
   outline: none;
   line-height: 1.6;
   font-size: 18px;

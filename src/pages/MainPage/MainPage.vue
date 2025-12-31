@@ -107,7 +107,38 @@ function initializeEditorData() {
   })
 }
 
+const isFocused = ref(false)
+provide('focus', isFocused)
+
+const initialHeight = window.innerHeight
+
+const handleResize = () => {
+  if (!window.visualViewport) return
+
+  const vv = window.visualViewport
+  const height = initialHeight - vv.height
+
+  const keyboardHeight = window.innerHeight - vv.height - vv.offsetTop
+
+  document.documentElement.style.setProperty(
+    '--keyboard-height',
+    `${Math.max(0, keyboardHeight)}px`,
+  )
+
+  document.documentElement.style.setProperty(
+    '--content-height',
+    `${window.visualViewport.height}px`,
+  )
+
+  isFocused.value = height > 100
+}
+
 onMounted(async () => {
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', handleResize)
+    window.visualViewport.addEventListener('scroll', handleResize)
+  }
+
   editor.value = buildEditorFromExtensions(
     defineExtension({
       name: 'LexicalEditor',
@@ -167,6 +198,15 @@ onMounted(async () => {
   // editor.value?.commands.setContent(editorData.value[viewType.value])
 })
 
+onUnmounted(() => {
+  unregisterAll?.()
+
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', handleResize)
+    window.visualViewport.removeEventListener('scroll', handleResize)
+  }
+})
+
 watch(viewType, (newVal) => {
   initializeEditorData()
   const editorState = editor.value.parseEditorState(editorData.value[newVal])
@@ -180,19 +220,15 @@ watch(selectedDateStore, () => {
   editor.value.setEditorState(editorState)
   // editor.value?.commands.setContent(editorData.value[viewType.value])
 })
-
-onUnmounted(() => {
-  unregisterAll?.()
-})
 </script>
 
 <template>
   <div
-    class="fixed inset-0 grid grid-rows-[auto_1fr_auto_max-content] [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto"
+    :class="'relative grid h-[var(--content-height,100svh)] max-h-svh grid-rows-[auto_1fr_auto] overscroll-none [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto'"
   >
     <div class="p-5">
       <EditorPeriodSlider
-        :class="'absolute top-[35%] right-2 z-9999'"
+        :class="'fixed top-[35%] right-2 z-9999'"
         v-model="sliderValue"
         @change="
           (value) => {
