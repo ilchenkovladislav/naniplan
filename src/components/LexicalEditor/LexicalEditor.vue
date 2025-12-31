@@ -1,5 +1,9 @@
 <template>
-  <div ref="editorRef" class="editor overscroll-none" contenteditable="true"></div>
+  <div
+    ref="editorRef"
+    class="editor overscroll-none [overflow-anchor:none]"
+    contenteditable="true"
+  ></div>
 
   <div
     v-if="isFocused"
