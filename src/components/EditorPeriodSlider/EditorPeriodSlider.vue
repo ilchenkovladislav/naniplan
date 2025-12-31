@@ -487,12 +487,12 @@ onUnmounted(() => {
 
 <style scoped>
 .slider {
-  --slider-height: 6px;
+  --slider-height: 4px;
   --slider-thumb-size: 24px;
   --slider-color-primary: #eee;
   --slider-color-track: #eee;
-  --slider-color-snap: oklch(64.6% 0.222 41.116);
-  --slider-color-snap-point: oklch(75% 0.183 55.934);
+  --slider-color-snap: oklch(75% 0.183 55.934);
+  --slider-color-snap-point: oklch(90.1% 0.076 70.697);
   --slider-vertical-height: 200px;
   --snap-animation-duration: 250ms;
 
@@ -557,8 +557,8 @@ onUnmounted(() => {
   top: 16px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 14px;
-  color: #666;
+  font-size: 10px;
+  color: #aaa;
   white-space: nowrap;
 }
 
@@ -690,9 +690,9 @@ onUnmounted(() => {
 .slider__thumb-inner {
   width: 100%;
   height: 100%;
-  background: var(--slider-color-primary);
+  background: var(--slider-color-snap);
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  //box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   transition:
     transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.15s ease,
@@ -701,7 +701,7 @@ onUnmounted(() => {
 
 .slider__thumb--active .slider__thumb-inner {
   transform: scale(1.25);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  //box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 .slider__thumb--snapping .slider__thumb-inner {
@@ -774,7 +774,7 @@ onUnmounted(() => {
 /* ==================== Адаптация для мобильных ==================== */
 @media (pointer: coarse) {
   .slider {
-    --slider-thumb-size: 16px;
+    --slider-thumb-size: 14px;
   }
 
   .slider__touch-area {

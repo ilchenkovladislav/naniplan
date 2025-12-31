@@ -253,34 +253,35 @@ watch(selectedDateStore, () => {
     :class="'relative grid h-[var(--content-height,100svh)] max-h-svh grid-rows-[auto_1fr_auto] overscroll-none [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto'"
   >
     <div class="p-5">
-      <EditorPeriodSlider
-        :class="'fixed top-[35%] right-2 z-9999'"
-        v-model="sliderValue"
-        @change="
-          (value) => {
-            changeViewType(valueToType[value])
-          }
-        "
-        @findClosestSnapPoint="
-          (value) => {
-            changeViewType(valueToType[value])
-          }
-        "
-        :min="0"
-        :max="100"
-        :height="150"
-        vertical
-        :snap-points="[
-          { value: 0, label: 'д' },
-          { value: 33, label: 'н' },
-          { value: 66, label: 'м' },
-          { value: 100, label: 'г' },
-        ]"
-        :snap-threshold="17"
-      />
       <EditorDate :viewType />
     </div>
+
     <LexicalEditor v-if="editor" :editor="editor" ref="editorRef" />
     <MonthCalendar />
   </div>
+  <EditorPeriodSlider
+    :class="'fixed top-[35%] right-2 z-9999'"
+    v-model="sliderValue"
+    @change="
+      (value) => {
+        changeViewType(valueToType[value])
+      }
+    "
+    @findClosestSnapPoint="
+      (value) => {
+        changeViewType(valueToType[value])
+      }
+    "
+    :min="0"
+    :max="100"
+    :height="150"
+    vertical
+    :snap-points="[
+      { value: 0, label: 'день' },
+      { value: 33, label: 'нед.' },
+      { value: 66, label: 'мес.' },
+      { value: 100, label: 'год' },
+    ]"
+    :snap-threshold="17"
+  />
 </template>
