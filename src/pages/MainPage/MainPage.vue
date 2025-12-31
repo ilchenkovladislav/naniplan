@@ -133,11 +133,35 @@ const handleResize = () => {
   isFocused.value = height > 100
 }
 
+function handleTouchMove(e) {
+  if (!isScrollableElement(e.target)) {
+    e.preventDefault()
+  }
+}
+
+function isScrollableElement(element) {
+  while (element && element !== document.body) {
+    const style = window.getComputedStyle(element)
+    const overflowY = style.getPropertyValue('overflow-y')
+
+    if (
+      (overflowY === 'auto' || overflowY === 'scroll') &&
+      element.scrollHeight > element.clientHeight
+    ) {
+      return true
+    }
+    element = element.parentElement
+  }
+  return false
+}
+
 onMounted(async () => {
   if (window.visualViewport) {
     window.visualViewport.addEventListener('resize', handleResize)
     window.visualViewport.addEventListener('scroll', handleResize)
   }
+
+  document.addEventListener('touchmove', handleTouchMove, { passive: false })
 
   editor.value = buildEditorFromExtensions(
     defineExtension({
@@ -205,6 +229,8 @@ onUnmounted(() => {
     window.visualViewport.removeEventListener('resize', handleResize)
     window.visualViewport.removeEventListener('scroll', handleResize)
   }
+
+  document.removeEventListener('touchmove', handleTouchMove)
 })
 
 watch(viewType, (newVal) => {
