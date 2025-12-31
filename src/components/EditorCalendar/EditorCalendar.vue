@@ -98,7 +98,7 @@ const isFocused = inject('focus')
     <div class="grid grid-cols-[40px_1fr] items-start">
       <div
         :class="[
-          'grid items-center justify-center border-r border-r-gray-100 text-[10px] text-gray-400',
+          'grid items-center justify-center border-r border-r-gray-100 py-4 text-[10px] text-gray-400',
           getGapClass(state),
         ]"
       >
@@ -122,6 +122,7 @@ const isFocused = inject('focus')
       <InfinityCarousel
         :onNext="() => (state = new Date(state.getFullYear(), state.getMonth() + 1))"
         :onPrev="() => (state = new Date(state.getFullYear(), state.getMonth() - 1))"
+        :padding="'py-4'"
       >
         <template #item="{ item }">
           <div
