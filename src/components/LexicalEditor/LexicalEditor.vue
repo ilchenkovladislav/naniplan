@@ -207,11 +207,6 @@ function toggleCheckList() {
   opacity: 1;
 }
 
-.listitem-checked {
-  //text-decoration: line-through;
-  //color: #9ca3af;
-}
-
 .listitem-unchecked:hover::before {
   border-color: #6b7280;
 }

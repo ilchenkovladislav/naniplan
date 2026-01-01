@@ -219,7 +219,6 @@ onMounted(async () => {
   initializeEditorData()
   const editorState = editor.value.parseEditorState(editorData.value[viewType.value])
   editor.value.setEditorState(editorState)
-  // editor.value?.commands.setContent(editorData.value[viewType.value])
 })
 
 onUnmounted(() => {
@@ -237,14 +236,12 @@ watch(viewType, (newVal) => {
   initializeEditorData()
   const editorState = editor.value.parseEditorState(editorData.value[newVal])
   editor.value.setEditorState(editorState)
-  // editor.value?.commands.setContent(editorData.value[newVal])
 })
 
 watch(selectedDateStore, () => {
   initializeEditorData()
   const editorState = editor.value.parseEditorState(editorData.value[viewType.value])
   editor.value.setEditorState(editorState)
-  // editor.value?.commands.setContent(editorData.value[viewType.value])
 })
 </script>
 
