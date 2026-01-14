@@ -486,6 +486,11 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.dark .slider {
+  --slider-color-track: oklch(20.8% 0.042 265.755);
+  --slider-color-primary: oklch(20.8% 0.042 265.755);
+}
+
 .slider {
   --slider-height: 4px;
   --slider-thumb-size: 24px;
@@ -550,6 +555,10 @@ onUnmounted(() => {
   height: 10px;
   transform: translate(-50%, -50%);
   z-index: 1;
+}
+
+.dark .slider__snap-label {
+  color: oklch(70.4% 0.04 256.788);
 }
 
 .slider__snap-label {

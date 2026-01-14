@@ -44,5 +44,5 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-  <RouterLink to="/yearView" class="text-gray-300">{{ formattedDate }}</RouterLink>
+  <RouterLink to="/yearView">{{ formattedDate }}</RouterLink>
 </template>

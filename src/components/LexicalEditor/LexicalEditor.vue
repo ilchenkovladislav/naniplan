@@ -1,29 +1,32 @@
 <template>
   <div
     ref="editorRef"
-    class="editor overscroll-none [overflow-anchor:none]"
+    class="editor overscroll-none [overflow-anchor:none] dark:bg-slate-800"
     contenteditable="true"
   ></div>
 
   <div
     v-if="isFocused"
-    class="fixed inset-x-0 bottom-0 mt-auto flex translate-y-[calc(var(--keyboard-height,0)*-1)] justify-center gap-4 bg-white py-3 will-change-transform"
+    class="fixed inset-x-0 bottom-0 mt-auto flex translate-y-[calc(var(--keyboard-height,0)*-1)] justify-center gap-4 bg-white py-3 will-change-transform dark:bg-slate-800"
     style="touch-action: none"
   >
-    <button @click="toggleBold" :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': isBold }]">
-      <LucideBold :size="20" />
+    <button
+      @click="toggleBold"
+      :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold dark:bg-slate-700': isBold }]"
+    >
+      <LucideBold :size="20" class="dark:text-white" />
     </button>
     <button
       @click="toggleItalic"
-      :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': isItalic }]"
+      :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold dark:bg-slate-700': isItalic }]"
     >
-      <LucideItalic :size="20" />
+      <LucideItalic :size="20" class="dark:text-white" />
     </button>
     <button
       @click="toggleCheckList"
-      :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold': isCheckList }]"
+      :class="['rounded px-4 py-2', { 'bg-gray-200 font-bold dark:bg-slate-700': isCheckList }]"
     >
-      <SquareCheck :size="20" />
+      <SquareCheck :size="20" class="dark:text-white" />
     </button>
   </div>
 </template>
@@ -127,6 +130,10 @@ function toggleCheckList() {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+.dark .editor {
+  color: #fff;
+}
+
 .editor {
   min-height: 250px;
   height: 100%;
@@ -153,6 +160,10 @@ function toggleCheckList() {
   list-style: none;
   padding: 0;
   margin: 8px 0;
+}
+
+.dark .listitem::before {
+  background-color: oklch(27.9% 0.041 260.031);
 }
 
 .listitem {
@@ -188,6 +199,11 @@ function toggleCheckList() {
   border-color: oklch(75% 0.183 55.934);
   animation: pulse 0.4s ease;
 }
+
+.dark .listitem-unchecked::before {
+  border-color: oklch(20.8% 0.042 265.755);
+}
+
 .listitem::after {
   content: '';
   position: absolute;

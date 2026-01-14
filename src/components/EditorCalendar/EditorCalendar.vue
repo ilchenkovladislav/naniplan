@@ -71,8 +71,11 @@ const isFocused = inject('focus')
 </script>
 
 <template>
-  <div v-if="!isFocused" class="relative grid grid-rows-[min-content_min-content_1fr]">
-    <div class="flex gap-1 justify-self-center text-gray-400">
+  <div
+    v-if="!isFocused"
+    class="relative grid grid-rows-[min-content_min-content_1fr] dark:bg-slate-800"
+  >
+    <div class="flex gap-1 justify-self-center text-gray-400 dark:text-slate-400">
       <div
         :class="[{ 'first-letter:text-orange-400': plansStore.hasPlan(state, 'month') }]"
         @click="onMonthClick"
@@ -88,7 +91,7 @@ const isFocused = inject('focus')
       </span>
     </div>
     <div
-      class="grid grid-cols-[repeat(7,_1fr)] border-b border-gray-100 py-2 pl-[40px] text-center text-sm text-gray-400"
+      class="grid grid-cols-[repeat(7,_1fr)] border-b border-gray-100 py-2 pl-[40px] text-center text-sm text-gray-400 dark:border-slate-900 dark:text-slate-400"
     >
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
         {{ dayOfWeek }}
@@ -98,7 +101,7 @@ const isFocused = inject('focus')
     <div class="grid grid-cols-[40px_1fr] items-start">
       <div
         :class="[
-          'grid items-center justify-center border-r border-r-gray-100 py-4 text-[10px] text-gray-400',
+          'grid items-center justify-center border-r border-r-gray-100 py-4 text-[10px] text-gray-400 dark:border-r-slate-900 dark:text-slate-400',
           getGapClass(state),
         ]"
       >
@@ -108,7 +111,7 @@ const isFocused = inject('focus')
           class="relative flex justify-center"
         >
           <div
-            class="relative grid h-10 items-center text-center text-xs text-gray-400"
+            class="relative grid h-10 items-center text-center text-xs text-gray-400 dark:text-slate-400"
             @click="() => onWeekClick(week.start)"
           >
             <BaseIndicator
@@ -136,14 +139,14 @@ const isFocused = inject('focus')
               :key="week.weekNumber"
             >
               <template v-for="day in week.days" :key="day.toString()">
-                <div class="flex justify-center">
+                <div class="flex justify-center dark:text-white">
                   <div
                     :class="[
                       'relative flex size-10 items-center justify-center text-lg',
-                      { 'text-gray-400': !day.isCurrentMonth },
+                      { 'text-gray-400 dark:text-slate-500': !day.isCurrentMonth },
                       { 'text-orange-300': isToday(day.date) },
                       {
-                        'rounded-full border border-orange-300 bg-red-100/30 font-bold text-orange-600':
+                        'rounded-full border border-orange-300 bg-red-100/30 font-bold text-orange-600 dark:bg-red-100/10':
                           day.date.toDateString() === selectedStore.selectedDate.toDateString(),
                       },
                     ]"

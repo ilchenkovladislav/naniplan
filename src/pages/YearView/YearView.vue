@@ -29,8 +29,8 @@ const variants = [
 </script>
 
 <template>
-  <div class="grid h-dvh grid-rows-[auto_1fr]">
-    <h2 class="relative z-10 bg-white px-5 py-2">{{ year }}</h2>
+  <div class="grid h-dvh grid-rows-[auto_1fr] dark:bg-slate-800">
+    <h2 class="relative z-10 bg-white px-5 py-2 dark:bg-slate-800 dark:text-white">{{ year }}</h2>
     <div class="grid px-5">
       <motion.div
         :initial="{ scale: 3, transformOrigin: variants[store.selectedDate.getMonth()] }"

@@ -10,10 +10,10 @@ const dates = computed(() => cacheCalendarMonth(year, monthIndex))
 <template>
   <div class="relative grid grid-rows-[min-content_min-content_1fr] gap-1">
     <div class="relative grid w-max items-center">
-      <h3 class="w-max text-sm">{{ months[monthIndex] }}</h3>
+      <h3 class="w-max text-sm dark:text-white">{{ months[monthIndex] }}</h3>
     </div>
 
-    <div class="start-2 grid grid-cols-8 text-center text-xs text-gray-400">
+    <div class="start-2 grid grid-cols-8 text-center text-xs text-gray-400 dark:text-slate-400">
       <div v-for="dayOfWeek in daysOfWeek" :key="dayOfWeek">
         {{ dayOfWeek }}
       </div>
@@ -24,14 +24,16 @@ const dates = computed(() => cacheCalendarMonth(year, monthIndex))
         <template v-for="day in week.days" :key="day.toString()">
           <div v-if="!day.isCurrentMonth" />
 
-          <div v-else class="relative flex justify-center">
+          <div v-else class="relative flex justify-center dark:text-white">
             <div :class="[{ 'font-bold text-orange-600': isToday(day.date) }]">
               {{ day.date.getDate() }}
             </div>
           </div>
         </template>
 
-        <div class="grid items-center justify-center gap-1 gap-y-2 text-[10px] text-gray-400">
+        <div
+          class="grid items-center justify-center gap-1 gap-y-2 text-[10px] text-gray-400 dark:text-slate-400"
+        >
           <div class="relative flex justify-center">
             <div>{{ week.weekNumber }}</div>
           </div>

@@ -19,6 +19,7 @@ import { $createParagraphNode, $getRoot, defineExtension } from 'lexical'
 import { CheckListExtension } from '@lexical/list'
 import { mergeRegister } from '@lexical/utils'
 import { registerRichText } from '@lexical/rich-text'
+import ToggleTheme from '@/components/ToggleTheme/ToggleTheme.vue'
 
 const editor = ref()
 let unregisterAll = null
@@ -249,8 +250,11 @@ watch(selectedDateStore, () => {
   <div
     :class="'relative grid h-[var(--content-height,100svh)] max-h-svh grid-rows-[auto_1fr_auto] overscroll-none [&>*:nth-child(2)]:min-h-0 [&>*:nth-child(2)]:overflow-y-auto'"
   >
-    <div class="p-5">
+    <div
+      class="flex items-center justify-between p-5 text-gray-300 dark:bg-slate-800 dark:text-slate-400"
+    >
       <EditorDate :viewType />
+      <ToggleTheme />
     </div>
 
     <LexicalEditor v-if="editor" :editor="editor" ref="editorRef" />
